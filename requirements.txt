@@ -1,0 +1,4 @@
+argparse # : For parsing command-line arguments.
+datetime # : For date and time handling.
+polib # For reading and writing PO files.
+deep_translator # For machine translation using Google Translate.
