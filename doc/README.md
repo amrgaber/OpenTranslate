@@ -7,7 +7,7 @@
 
 **Installation:**
 
-1.  **Clone the repository:** `git clone https://github.com/[your-username]/[repo-name]`
+1.  **Clone the repository:** `git clone https://github.com/amrgaber/OpenTranslate.git`
 2.  **Install dependencies:** `pip install -r requirements.txt` (if a requirements file exists)
 
 **Usage:**
@@ -20,8 +20,6 @@ Bash
 python [script-name].py -p <source_file> -l <target_language> [options]
 
 ```
-
-Use code [with caution.](https://gemini.google.com/faq#coding)
 
 2.  Replace `<source_file>` with the path to your source PO file (relative or absolute).
     
