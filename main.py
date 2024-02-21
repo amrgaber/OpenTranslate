@@ -12,13 +12,8 @@ logger = logging.getLogger('po_translator')
 logger.setLevel(logging.INFO)
 
 # Choose an output destination (e.g., console, file)
-# Option 1: Print to console
 handler = logging.StreamHandler()
 logger.addHandler(handler)
-
-# Option 2: Write to a log file
-# handler = logging.FileHandler('po_translator.log')
-# logger.addHandler(handler)
 
 # Optionally, set a log format (e.g., timestamp, level, message)
 formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
@@ -56,7 +51,6 @@ def translate_po_file(src_path, target_lang, dest_dir=None, create_dir=False, ou
     """
 
     # Handle relative paths based on current working directory:
-    print(src_path)
     if not os.path.isabs(src_path):
         src_path = os.path.join(os.getcwd(), src_path)
         # Check if file exists
@@ -90,8 +84,6 @@ def translate_po_file(src_path, target_lang, dest_dir=None, create_dir=False, ou
     new_filename = f"{short_filename}_{timestamp}.po"
     output_path = os.path.join(dest_dir, new_filename)
     po.save(output_path)
-    print(f"Translated PO file saved to: {output_path}")
-
     return output_path
 
 def main():
