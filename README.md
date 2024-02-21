@@ -36,7 +36,7 @@ python [script-name].py -p <source_file> -l <target_language> [options]
 Bash
 
 ```
-python main.py -p my_translation.po -l ar -d localized_files
+python translate_po.py -p my_translation.po -l ar -d localized_files
 
 ```
 
