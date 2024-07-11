@@ -17,7 +17,7 @@
 Bash
 
 ```
-python [script-name].py -p <source_file> -l <target_language> [options]
+python translate_po.py -p <source_file> -l <target_language> [options]
 
 ```
 
