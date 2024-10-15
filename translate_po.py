@@ -1,9 +1,8 @@
-import argparse
-import datetime
 import os
 import polib
 from deep_translator import GoogleTranslator
 import logging
+import datetime
 
 # Create a logger with a specific name (e.g., 'po_translator')
 logger = logging.getLogger('po_translator')
@@ -19,32 +18,32 @@ logger.addHandler(handler)
 formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
 handler.setFormatter(formatter)
 
-def parse_arguments():
-    parser = argparse.ArgumentParser(description="Translate PO files using Google Translate.")
 
-    # Handle both relative and absolute paths with optional sub-folder:
-    parser.add_argument("-p", "--path", required=True, help="Path to the source PO file (can be relative or absolute, may include sub-folder).")
+def get_user_input():
+    src_path = input("Enter the path to the source PO file: ").strip()
+    while not os.path.exists(src_path):
+        print("File not found. Please try again.")
+        src_path = input("Enter the path to the source PO file: ").strip()
 
-    # Other arguments:
-    parser.add_argument("-l", "--lang", required=True,
-                        help="Target language code (e.g., en, fr, es) (required).")
-    parser.add_argument("-d", "--dest_dir", default=None,
-                        help="Destination directory for translated PO file (default: same directory as source if not specified).")
-    parser.add_argument("-c", "--create_dir", action="store_true", default=False,
-                        help="Create destination directory if it doesn't exist (only if -d is not specified).")
-    parser.add_argument("-o", "--out_format", default="{base_name}_{date}_{time}.po",
-                        help="Format string for generating the output file name (default: '%(base_name)s_%(date)s_%(time)s.po').")
+    target_lang = input(
+        "Enter the target language code (e.g., en, fr, es): ").strip()
 
-    return parser.parse_args()
+    dest_dir = input(
+        "Enter the destination directory for the translated file (press Enter for same as source): ").strip()
+    if not dest_dir:
+        dest_dir = os.path.dirname(src_path)
 
-def translate_po_file(src_path, target_lang, dest_dir=None, create_dir=False, out_format="{base_name}_{date}_{time}.po"):
+    return src_path, target_lang, dest_dir
+
+
+def translate_po_file(src_path, target_lang, dest_dir):
     """
     Translates a PO file using Google Translate, replacing existing translations and avoiding new lines.
 
     Args:
         src_path: Path to the source PO file.
         target_lang: Target language code.
-        dest_path: Path to the destination PO file (optional, defaults to overwriting source).
+        dest_dir: Path to the destination directory.
 
     Returns:
         Path to the translated PO file.
@@ -57,23 +56,18 @@ def translate_po_file(src_path, target_lang, dest_dir=None, create_dir=False, ou
     if not os.path.exists(src_path):
         raise FileNotFoundError(f"PO file not found at: {src_path}")
     if not os.access(src_path, os.R_OK):
-        raise PermissionError(f"Insufficient permissions to access PO file: {src_path}")
+        raise PermissionError(
+            f"Insufficient permissions to access PO file: {src_path}")
 
     po = polib.pofile(src_path)
     for entry in po:  # Iterate over all entries (not just untranslated ones)
         if not entry.msgstr:  # Check if translation is missing
-            translated_text = GoogleTranslator(source='auto', target=target_lang).translate(entry.msgid)
+            translated_text = GoogleTranslator(
+                source='auto', target=target_lang).translate(entry.msgid)
             entry.msgstr = translated_text  # Update the existing msgstr field
 
     # Determine destination directory
-    if not dest_dir:
-        dest_dir = os.path.dirname(src_path)  # Same directory as source
-
-    # Ensure destination directory exists (only if not explicitly provided)
-    if not os.path.exists(dest_dir) and not create_dir and not dest_dir:
-        raise Exception(f"Destination directory '{dest_dir}' does not exist. Use -c to create it or specify a different -d option.")
-
-    if not os.path.exists(dest_dir) and create_dir:
+    if not os.path.exists(dest_dir):
         os.makedirs(dest_dir)
 
     # Generate unique output file name using format string
@@ -86,15 +80,17 @@ def translate_po_file(src_path, target_lang, dest_dir=None, create_dir=False, ou
     po.save(output_path)
     return output_path
 
+
 def main():
-    args = parse_arguments()
-    src_path = args.path
-    target_lang = args.lang
-    dest_dir = args.dest_dir
-    create_dir = args.create_dir
     logger.info("Starting PO translation script.")
+    src_path, target_lang, dest_dir = get_user_input()
     logger.info(f"Source file: {src_path}")
-    translated_path = translate_po_file(src_path, target_lang, dest_dir, create_dir, args.out_format)
+    logger.info(f"Target language: {target_lang}")
+    logger.info(f"Destination directory: {dest_dir}")
+
+    translated_path = translate_po_file(src_path, target_lang, dest_dir)
+    logger.info(f"Translated file saved to: {translated_path}")
+
 
 if __name__ == "__main__":
     main()
